@@ -24,7 +24,9 @@ function DOMDisplay (parent, level){
 
             this.level.grid.forEach(row => {
                 let rowElement = createElement('tr');
+                rowElement.style.height = SCALE+'px';
                 table.appendChild(rowElement);
+                row.forEach(type=>rowElement.appendChild(createElement('td', type)));
                 
             });
         return table;
