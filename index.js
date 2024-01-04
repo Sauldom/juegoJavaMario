@@ -12,8 +12,9 @@ function trackKeys(keyCodes){
         if(keyCodes.hasOwnProperty(event.keyCode)){
             let downPressed =event.type === 'keydown';
             pressedKeys[keyCodes[event.keyCode]]=downPressed;
+            event.preventDefault();
         }
-        console.log(pressedKeys);
+      
     }
     addEventListener('keydown', handler);
     addEventListener('keyup', handler);
@@ -21,5 +22,38 @@ function trackKeys(keyCodes){
     return pressedKeys;
 }
 
-let level = new Level(GAME_LEVELS);
-let display = new DOMDisplay(document.body,level);
+function runAnimation (frameFunction){
+    let lastTime=null;
+    function frame(time){
+        let stop =false;
+        if(lastTime !== null){
+            let timeStep = Math.min(time - lastTime, 100)/1000; //se queda con el menor
+            stop = frameFunction(timeStep) ===false;
+        }
+        lastTime =time;
+        if(!stop) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+}
+function runLevel(level,Display, callback){
+    let display = new Display(document.body, level);
+    runAnimation(function(step){
+        level.animate(step, arrows);
+        display.drawFrame();
+        if(level.isFinished()){
+            display.clear();
+            if (callback) callback(level.status);
+            return false
+        }
+    })
+}
+
+function runGame (level, Display){
+    let levelObject = new Level(GAME_LEVELS);
+
+    runLevel(levelObject, Display, status =>{
+        if(status==='lost') console.log('Has perdido');
+        else console.log('Has Ganado');
+    });
+}
+runGame(GAME_LEVELS, DOMDisplay);

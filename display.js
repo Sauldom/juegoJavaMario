@@ -23,7 +23,7 @@ function DOMDisplay (parent, level){
     //this.wrap.appendChild(this.drawActors());
     this.actorsLayer =null;
 
-    this.drawFrame();
+    
     
 
 }
@@ -51,7 +51,7 @@ DOMDisplay.prototype.drawActors = function (){
         rect.style.left = actor.position.x * SCALE + 'px';
         rect.style.top = actor.position.y * SCALE + 'px';
     });
-    console.log(actorWrap);
+    
     return actorWrap;
 }
 
