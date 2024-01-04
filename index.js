@@ -1,30 +1,25 @@
 //script de inicio de juego
-let plan = 
-["                                                                                ",
-"                                                                                ",
-"                                                                                ",
-"                                                                                ",
-"                                                                                ",
-"                                                                                ",
-"                                                                  xxx           ",
-"                                                   xx      xx    xx!xx          ",
-"                                    o o      xx                  x!!!x          ",
-"                                                                 xx!xx          ",
-"                                   xxxxx                          xvx           ",
-"                                                                            xx  ",
-"  xx                                      o o                                x  ",
-"  x                     o                                                    x  ",
-"  x                                      xxxxx                             o x  ",
-"  x          xxxx       o                                                    x  ",
-"  x  @       x  x                                                xxxxx       x  ",
-"  xxxxxxxxxxxx  xxxxxxxxxxxxxxx   xxxxxxxxxxxxxxxxxxxx     xxxxxxx   xxxxxxxxx  ",
-"                              x   x                  x     x                    ",
-"                              x!!!x                  x!!!!!x                    ",
-"                              x!!!x                  x!!!!!x                    ",
-"                              xxxxx                  xxxxxxx                    ",
-"                                                                                ",
-"                                                                                "];
-console.log('Ready');
+const ARROW_CODES ={
+    37:'left',
+    38:'up',
+    39:'right'
+}
+let arrows = trackKeys(ARROW_CODES);
+function trackKeys(keyCodes){
+    let pressedKeys ={};
+    //los listener son eventos que nos permiten reaccionar
+    function handler(event){
+        if(keyCodes.hasOwnProperty(event.keyCode)){
+            let downPressed =event.type === 'keydown';
+            pressedKeys[keyCodes[event.keyCode]]=downPressed;
+        }
+        console.log(pressedKeys);
+    }
+    addEventListener('keydown', handler);
+    addEventListener('keyup', handler);
 
-let level = new Level(plan);
+    return pressedKeys;
+}
+
+let level = new Level(GAME_LEVELS);
 let display = new DOMDisplay(document.body,level);

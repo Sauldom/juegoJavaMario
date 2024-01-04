@@ -1,4 +1,9 @@
 const ACTORS ={
+    'o' :Coin,
+    '@': Player,
+    '=': Lava,
+    '|': Lava,
+    'v': Lava,
 
 };
 
@@ -6,8 +11,10 @@ const ACTORS ={
 function Level (plan){
     this.width = plan[0].length;//ancho del nivel
     this.height = plan.length;//alto del nivel
-
+    this.status = null;
+    this.finishDelay = null;
     this.grid = [];
+    this.actors = [];
 
     for(let y=0;y<this.height;y++){
         let line = plan[y];
@@ -15,6 +22,10 @@ function Level (plan){
         for (let x=0;x<this.width;x++){
             let character = line[x];
             let characterType=null;
+
+            let Actor = ACTORS[character];
+            
+            if (Actor) this.actors.push(new Actor(new Vector(x,y),character));
             if(character === 'x') characterType='wall';
             else if(character ==='!') characterType='lava';
 
@@ -22,5 +33,10 @@ function Level (plan){
         }
         this.grid.push(gridLine);
     }
-    console.log(this.grid);
+    console.log(this.actors);
+}
+
+Level.prototype.isFinished = function (){
+    return (this.status !== null && this.finishDelay <0);
+        
 }
