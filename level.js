@@ -10,10 +10,14 @@ const ACTORS ={
 const MAX_STEP = 0.05;
 
 function Level (plan){
+
+    if(!validateLevel(plan)) throw new Error ('You need a player and a coin to start');
+
     this.width = plan[0].length;//ancho del nivel
     this.height = plan.length;//alto del nivel
     this.status = null;
     this.finishDelay = null;
+    this.actor =null;
     this.grid = [];
     this.actors = [];
 
@@ -34,7 +38,9 @@ function Level (plan){
         }
         this.grid.push(gridLine);
     }
-    console.log(this.actors);
+    this.actor = this.actors.filter(actor => actor.type==='player');
+    
+    console.log(this.actor);
 }
 
 Level.prototype.isFinished = function (){
@@ -50,4 +56,58 @@ Level.prototype.animate = function (step,keys){
         this.actors.forEach(actor =>actor.act(thisStep, this, keys));
         step-=thisStep;
     }
+}
+
+Level.prototype.obstacleAt = function(position, size){
+    let xStart = Math.floor(position.x);
+    let xEnd =Math.ceil(position.x +size.x)
+    let yStart =Math.floor(position.y);
+    let yEnd =Math.ceil(position.y + size.y);
+
+    if(xStart<0 || xEnd>this.width || yStart<0) return 'wall';
+    if(yEnd >this.height) return 'lava';
+
+    for(let y =yStart; y<yEnd; y++){
+        for(let x = xStart; x<xEnd;x++){
+            let fieldType = this.grid[y][x];
+            if(fieldType) return fieldType;
+        }
+    }
+}
+
+Level.prototype.playerTouched = function (type,actor){
+    if(type ==='lava' && this.status ===null){
+        this.status = 'lost';
+        this.finishDelay = 1;        
+    }else if (type ==='coin'){
+        console.log(type);
+        this.actors = this.actors.filter(otherActor=> otherActor!==actor);
+        console.log(this.actors);
+        if(!remainsCoins(this.actors)){
+            this.status ='won';
+            this.finishDelay =2;
+        }
+    }
+}
+Level.prototype.actorAct = function(actor){
+    for(let i=0; i<this.actors.length;i++){
+        let other = this.actors[i];
+        if(actor !==other && 
+            actor.position.x + actor.size.x >other.position.x &&
+            actor.position.x <other.position.x + other.size.x &&
+            actor.position.y + actor.size.y > other.position.y &&
+            actor.position.y <other.position.y + other.size.y){
+                return other;
+        }
+    }
+}
+
+function validateLevel (level){
+    /*for (let i=0;i<level.length;i++){
+        if(level[i].indexOf('@')!==-1) return true
+    }*/
+    return level.some(row=>row.indexOf('@')!==-1) && level.some(row=>row.indexOf('o' !==-1));
+}
+function remainsCoins(actors){
+    return actors.some(actor => actor.type ==='coin');
 }
